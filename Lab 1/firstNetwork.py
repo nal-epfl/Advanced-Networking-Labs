@@ -3,19 +3,21 @@
 """
 This example shows how to create a Mininet object and add nodes to it manually.
 """
+
 # Importing Libraries
 from mininet.net import Mininet
 from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
+from mininet.term import makeTerms
+
 
 # Function definition: This is called from the main function
-
-
 def firstNetwork():
 
     # Create an empty network and add nodes to it.
     net = Mininet()
+
     info('*** Adding controller\n')
     net.addController('c0')
 
@@ -33,38 +35,15 @@ def firstNetwork():
     info('*** Starting network\n')
     net.start()
 
-    # This is used to run commands on the hosts
-
+    # Open an independent xterm for each host using Mininet's
+    # built-in terminal handling.
     info('*** Starting xterm on hosts\n')
-    h1.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h1 &'
-    )
-    h2.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h2 &'
-    )
+    net.terms += makeTerms([h1, h2], title='Host', term='xterm')
 
     info('*** Running the command line interface\n')
     CLI(net)
 
-    info('*** Closing the terminals on the hosts\n')
-    h1.cmd("killall xterm")
-    h2.cmd("killall xterm")
-
-    info('*** Stopping network')
+    info('*** Stopping network\n')
     net.stop()
 
 
