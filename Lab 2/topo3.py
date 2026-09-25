@@ -7,6 +7,7 @@ from mininet.net import Mininet
 from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
+from mininet.term import makeTerms
 
 "Function definition:  This is called from the main function"
 def firstNetwork():
@@ -24,8 +25,6 @@ def firstNetwork():
 	h3 = net.addHost( 'h3') 
 	h4 = net.addHost( 'h4')
 
-
-
 	info( '*** Adding router \n' )
 	r1 = net.addHost( 'r1' ) 
 	r2 = net.addHost( 'r2' )
@@ -40,8 +39,6 @@ def firstNetwork():
 	net.addLink( r2, r3, intfName1='r2-eth2',intfName2='r3-eth1' )
 	net.addLink( r3, h4, intfName1='r3-eth0',intfName2='h4-eth0' )
 
-
-
 	info( '*** Starting network\n') 
 	net.start()
 	"This is used to run commands on the hosts"
@@ -54,7 +51,6 @@ def firstNetwork():
 	h1.cmd('ip -6 addr add 2020::1:2/112 dev h1-eth0')
 	h1.cmd('ip -6 route add default via 2020::1:1')
     
-    
 	h2.cmd('ip -4 addr flush dev h2-eth0')
 	h2.cmd('ip addr add 10.0.2.2/24 dev h2-eth0')
 	h2.cmd('ip route add default via 10.5.0.100')
@@ -62,14 +58,12 @@ def firstNetwork():
 	h2.cmd('ip -6 addr add 2020::2:2/112 dev h2-eth0')
 	h2.cmd('ip -6 route add default via 2020::10:2')
     
-    
 	h3.cmd('ip -4 addr flush dev h3-eth0')
 	h3.cmd('ip addr add 10.0.3.2/24 dev h3-eth0')
 	h3.cmd('ip route add default via 10.0.3.1')
     #ipv6
 	h3.cmd('ip -6 addr add 2020::3:2/112 dev h3-eth0')
 	h3.cmd('ip -6 route add default via 2020::3:1')
-    
     
 	h4.cmd('ip -4 addr flush dev h4-eth0')
 	h4.cmd('ip addr add 10.0.4.2/24 dev h4-eth0')
@@ -115,121 +109,40 @@ def firstNetwork():
 	r3.cmd('ip -6 addr add 2020::6:2/112 dev r3-eth1')
 	r3.cmd('ip -6 addr add 2020::7:2/112 dev r3-eth2')
 
-
 	r2.cmd('echo 1 > /proc/sys/net/ipv4/ip_forward')
 	r3.cmd('echo 1 > /proc/sys/net/ipv4/ip_forward')
     #ipv6
 	r2.cmd('echo 1 > /proc/sys/net/ipv6/conf/all/forwarding')
 	r3.cmd('echo 1 > /proc/sys/net/ipv6/conf/all/forwarding')
 
-    
 	r1.cmd('ip route add 10.0.3.0/24 via 10.0.5.2')
 	r1.cmd('ip route add 10.0.4.0/24 via 10.0.7.2')
 	r1.cmd('ip route add 10.0.6.0/24 via 10.0.7.2')
-    
     
 	r3.cmd('ip route add 10.0.1.0/24 via 10.0.7.1')
 	r3.cmd('ip route add 10.0.2.0/24 via 10.0.7.1')
 	r3.cmd('ip route add 10.0.3.0/24 via 10.0.6.1')
 	r3.cmd('ip route add 10.0.5.0/24 via 10.0.7.1')
     
-    
     #ipv6 route
 	r1.cmd('ip -6 route add 2020::3:0/112 via 2020::5:2')
 	r1.cmd('ip -6 route add 2020::4:0/112 via 2020::7:2')
 	r1.cmd('ip -6 route add 2020::6:0/112 via 2020::7:2')
-    
 
 	r3.cmd('ip -6 route add 2020::1:0/112 via 2020::7:1')
 	r3.cmd('ip -6 route add 2020::2:0/112 via 2020::7:1')
 	r3.cmd('ip -6 route add 2020::3:0/112 via 2020::6:1')
 	r3.cmd('ip -6 route add 2020::5:0/112 via 2020::7:1')
 
-
 	info( '*** Starting xterm on hosts\n' )
-	h1.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h1 &'
-    )
-	h2.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h2 &'
-    )
-	h3.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h3 &'
-    )
-	h4.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h4 &'
-    )
+	net.terms += makeTerms(
+		[h1, h2, h3, h4, r1, r2, r3],
+		title='Host',
+		term='xterm'
+	)
 
-
-	r1.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T r1 &'
-    )
-	r2.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T r2 &'
-    )
-	r3.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T r3 &'
-    )
 	info( '*** Running the command line interface\n' ) 
 	CLI( net )
-
-	info( '*** Closing the terminals on the hosts\n' ) 
-	h1.cmd("killall xterm")
-	h2.cmd("killall xterm")
-	h3.cmd("killall xterm")
-	h4.cmd("killall xterm")
-	r1.cmd("killall xterm")
-	r2.cmd("killall xterm")
-	r3.cmd("killall xterm")
 
 	info( '*** Stopping network' )
 	net.stop()
