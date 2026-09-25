@@ -7,6 +7,7 @@ from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 from mininet.node import Controller
 from mininet.net import Mininet
+from mininet.term import makeTerms
 
 "Function definition:  This is called from the main function"
 
@@ -42,55 +43,14 @@ def firstNetwork():
     "This is used to run commands on the hosts"
 
     info('*** Starting xterm on hosts\n')
-    h1.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h1 &'
-    )
-    h2.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h2 &'
-    )
-    h3.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h3 &'
-    )
-    h4.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h4 &'
+    net.terms += makeTerms(
+        [h1, h2, h3, h4],
+        title='Host',
+        term='xterm'
     )
 
     info('*** Running the command line interface\n')
     CLI(net)
-
-    info('*** Closing the terminals on the hosts\n')
-    h1.cmd("killall xterm")
-    h2.cmd("killall xterm")
-    h3.cmd("killall xterm")
-    h4.cmd("killall xterm")
 
     info('*** Stopping network')
     net.stop()
