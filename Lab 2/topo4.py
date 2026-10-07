@@ -8,6 +8,7 @@ from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 from mininet.link import Intf
+from mininet.term import makeTerms
 
 "Function definition:  This is called from the main function"
 def firstNetwork():
@@ -46,42 +47,14 @@ def firstNetwork():
 	r1.cmd('echo 1 > /proc/sys/net/ipv4/ip_forward')
 
 	info( '*** Starting xterm on hosts\n' )
-	h1.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h1 &'
-    )
-	h2.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T h2 &'
-    )
-	r1.cmd(
-        'xterm '
-        '-xrm "XTerm.vt100.allowTitleOps: false" '
-        '-xrm "XTerm.vt100.selectToClipboard: true" '
-        '-xrm "XTerm.vt100.translations: #override '
-        'Ctrl Shift <Key>C: copy-selection(CLIPBOARD)\\n'
-        'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)\\n'
-        'Shift <Key>Insert: insert-selection(CLIPBOARD)" '
-        '-T r1 &'
-    )
+	net.terms += makeTerms(
+		[h1, h2, r1],
+		title='Host',
+		term='xterm'
+	)
+
 	info( '*** Running the command line interface\n' ) 
 	CLI( net )
-
-	info( '*** Closing the terminals on the hosts\n' ) 
-	h1.cmd("killall xterm")
-	h2.cmd("killall xterm")
 
 	info( '*** Stopping network' )
 	net.stop()
