@@ -13,7 +13,7 @@ class NATTypesCLI(CLI):
     """Mininet prompt commands specific to this activity."""
 
     def do_setupnat(self, _line):
-        """Install the final port-restricted UDP NAT without opening a hole."""
+        """Install the final port-restricted UDP NAT."""
         PC4 = self.mn.get('PC4')
 
         commands = [
@@ -51,7 +51,7 @@ class NATTypesCLI(CLI):
             if not 1 <= port <= 65535:
                 raise ValueError
         except ValueError:
-            info('*** Usage: holepunch <PC2-UDP-source-port>\n')
+            info('*** Usage: sendUDP <PC2-UDP-source-port>\n')
             return
 
         PC1 = self.mn.get('PC1')
@@ -64,7 +64,7 @@ class NATTypesCLI(CLI):
             's.close()"'
         )
         if output:
-            info('*** Hole punching failed:\n%s' % output)
+            info('*** sendUDP failed:\n%s' % output)
             return
         info('*** PC1 sent a packet to PC2 UDP port %d.\n' % port)
 
