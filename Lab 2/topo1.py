@@ -20,10 +20,10 @@ def firstNetwork():
     net.addController('c0')
 
     info('*** Adding hosts \n')
-    h1 = net.addHost('h1', ip='10.0.0.1/24')
-    h2 = net.addHost('h2', ip='10.0.0.2/24')
-    h3 = net.addHost('h3', ip='10.0.0.3/24')
-    h4 = net.addHost('h4', ip='10.0.0.4/31')
+    h1 = net.addHost('h1', ip='10.10.0.1/24')
+    h2 = net.addHost('h2', ip='10.10.0.2/24')
+    h3 = net.addHost('h3', ip='10.10.0.3/24')
+    h4 = net.addHost('h4', ip='10.10.0.4/31')
 
     info('*** Adding switches\n')
     s1 = net.addSwitch('s1')
