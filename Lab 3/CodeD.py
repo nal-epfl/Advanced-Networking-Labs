@@ -1,22 +1,21 @@
 import socket
 
 HOST = "localhost"
-PORT = 5002   
+PORT = 5008 
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect((HOST,PORT))
-
-message = "Oh Romeo, Romeo! wherefore art thou Romeo?"
-print("sending:", message)
-sock.sendall(message.encode())
-	
-received = 0
-expected = len(message)
-	
-while received < expected:
-	data = sock.recv(16).decode()
-	received += len(data)
-	print ('received:', data)
-
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind((HOST, PORT))
+sock.listen(1)
 while True:
-	pass
+	connection, addr = sock.accept()
+	while True:
+		data = connection.recv(12).decode()
+		print("received:", data)
+		if data:
+			connection.sendall(data.encode())
+		else:
+			print("No more data from", addr)
+			break
+	
+	connection.close()
