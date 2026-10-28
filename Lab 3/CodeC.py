@@ -1,21 +1,22 @@
 import socket
 
 HOST = "localhost"
-PORT = 5002  
+PORT = 50008
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sock.bind((HOST, PORT))
-sock.listen(1)
-while True:
-	connection, addr = sock.accept()
-	while True:
-		data = connection.recv(8).decode()
-		print("received:", data)
-		if data:
-			connection.sendall(data.encode())
-		else:
-			print("No more data from", addr)
-			break
+sock.connect((HOST,PORT))
+
+message = "To connect, or not to connect, that is the TCP question. "
+print("sending:", message)
+sock.sendall(message.encode())
 	
-	connection.close()
+received = 0
+expected = len(message)
+	
+while received < expected:
+	data = sock.recv(20).decode()
+	received += len(data)
+	print ('received:', data)
+
+while True:
+	pass
