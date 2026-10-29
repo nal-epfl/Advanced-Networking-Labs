@@ -26,7 +26,7 @@ def main() -> None:
 
     context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
     context.load_verify_locations(cafile=ca_certificate)
-    # context.check_hostname = False
+    context.check_hostname = False
     # uncomment tht following line if you are testing on python version 3.13 or later
     context.verify_flags &= ~ssl.VERIFY_X509_STRICT
 
