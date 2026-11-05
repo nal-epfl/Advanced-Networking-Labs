@@ -6,7 +6,7 @@ from mininet.net import Mininet
 from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from mininet.term import cleanUpScreens, makeTerms
+from mininet.term import makeTerms
 from mininet.node import Controller, OVSSwitch
 from mininet.util import irange
 import os
@@ -84,23 +84,20 @@ def Lab4_Network():
 
     info( '*** Starting network\n')
     net.start()
-    "This is used to run commands on the hosts and starting xterm on hosts"
+    "This is used to run commands on the hosts"
 
     info( '*** Configuring hosts\n' )
     h1.cmd('ip route add default via 10.10.11.1')
     h1.cmd('ip -6 addr add 2001:1:0:11::10/64 dev h1-eth1')
     h1.cmd('ip -6 route add default via 2001:1:0:11::1')
-    h1.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h1 &')
 
     h2.cmd('ip route add default via 10.10.35.5')
     h2.cmd('ip -6 addr add 2001:1:0:35::20/64 dev h2-eth1')
     h2.cmd('ip -6 route add default via 2001:1:0:35::5')
-    h2.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h2 &')
-    
+
     h3.cmd('ip route add default via 10.10.35.3')
     h3.cmd('ip -6 addr add 2001:1:0:35::30/64 dev h3-eth1')
     h3.cmd('ip -6 route add default via 2001:1:0:35::3')
-    h3.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h3 &')
 
     index=3
     for host in hosts:
@@ -108,13 +105,8 @@ def Lab4_Network():
         host.cmd('ip route add default via 10.10.24.2')
         host.cmd('ip -6 addr add 2001:1:0:24::%s0/64 dev h%s-eth1' % (index, index))
         host.cmd('ip -6 route add default via 2001:1:0:24::2')
-        host.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h%s &' % index)
 
-
-    index=0
     for router in routers:
-        index+=1
-        router.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T r%s &' % index)
         router.cmd('sysctl -w net.ipv4.conf.all.rp_filter=0')
 
     r1.cmd('sysctl -w net.ipv4.conf.r1-eth1.rp_filter=0')
@@ -140,20 +132,16 @@ def Lab4_Network():
 
 
     os.system("chown advnet /home/advnet/Desktop/lab4/logs/*")
+
+    info( '*** Starting xterm on hosts\n' )
+    net.terms += makeTerms(
+        [h1, h2, h3] + hosts + routers,
+        title='Host',
+        term='xterm'
+    )
+
     info( '*** Running the command line interface\n' )
     CLI( net )
-    
-    info( '*** Closing the terminals on the hosts\n' )
-    h1.cmd("killall xterm")
-    h2.cmd("killall xterm")
-    h3.cmd("killall xterm")
-
-    for host in hosts:
-        host.cmd("killall xterm")
-
-    for router in routers:
-        router.cmd("killall xterm")
-
 
     info( '*** Stopping network' )
     net.stop()
