@@ -6,16 +6,25 @@ from mininet.net import Mininet
 from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from mininet.term import makeTerms
+from mininet.term import tunnelX11
 from mininet.node import Controller, OVSSwitch
 from mininet.util import irange
 import os
 
+def openXterm( node, title ):
+    "Open an xterm on node titled 'title: name' (Mininet's makeTerm adds literal quotes)"
+    display, tunnel = tunnelX11( node )
+    if display is None:
+        return []
+    term = node.popen( [ 'xterm', '-title', '%s: %s' % ( title, node.name ),
+                         '-display', display, '-e', 'env TERM=ansi bash' ] )
+    return [ tunnel, term ] if tunnel else [ term ]
+
 "Function definition:  This is called from the main function"
 def Lab4_Network():
     os.system('mn -c')
-    os.system('kill $(ps -aux | pgrep zebra)')
-    os.system('kill $(ps -aux | pgrep ospfd)')
+    # Stop only the FRR daemons started for this lab (not the system FRR service)
+    os.system("pkill -f '/usr/lib/frr/(zebra|ospfd|ospf6d) -d -f /home/advnet/Desktop/lab4'")
     os.system('rm /home/advnet/Desktop/lab4/run/*')
     os.system('rm /home/advnet/Desktop/lab4/logs/*')
 
@@ -133,12 +142,11 @@ def Lab4_Network():
 
     os.system("chown advnet /home/advnet/Desktop/lab4/logs/*")
 
-    info( '*** Starting xterm on hosts\n' )
-    net.terms += makeTerms(
-        [h1, h2, h3] + hosts + routers,
-        title='Host',
-        term='xterm'
-    )
+    info( '*** Starting xterm on hosts and routers\n' )
+    for host in [h1, h2, h3] + hosts:
+        net.terms += openXterm( host, 'Host' )
+    for router in routers:
+        net.terms += openXterm( router, 'Router' )
 
     info( '*** Running the command line interface\n' )
     CLI( net )
