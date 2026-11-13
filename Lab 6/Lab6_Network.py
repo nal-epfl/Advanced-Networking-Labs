@@ -8,7 +8,7 @@ from mininet.net import Mininet
 from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from mininet.term import cleanUpScreens, makeTerms
+from mininet.term import makeTerms
 from mininet.node import Controller, OVSSwitch
 
 "Function definition:  This is called from the main function"
@@ -127,18 +127,6 @@ def Lab6_Network():
 	h5.cmd('ip -6 addr add 2001:1:0:5050::50/64 dev h5-eth1')
 	h5.cmd('ip -6 route add default via 2001:1:0:5050::5')
 
-	info( '*** Starting xterm on hosts\n' )
-
-	h1.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h1 &')
-	h2.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h2 &')
-	h5.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T h5 &')
-
-	r1.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T r1 &')
-	r2.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T r2 &')
-	r3.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T r3 &')
-	r4.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T r4 &')
-	r5.cmd('xterm -xrm \'XTerm.vt100.allowTitleOps: false\' -T r5 &')
-
 	info( '*** Activating daemons \n' )
 
 	k = 0
@@ -153,18 +141,15 @@ def Lab6_Network():
 			r.cmd('/usr/lib/frr/ospf6d -d -f ' + dir_name + 'configs/'+ 'ospf6d_r' + str(k+1) + '.cfg -i ' + dir_name + 'run/'+ 'ospf6d_r' + str(k+1) + '.pid -z ' + dir_name + 'run/'+ 'frr_r' + str(k+1) + '.api -u frr -g frr')
 		k = k+1
 
+	info( '*** Starting xterm on hosts\n' )
+	net.terms += makeTerms(
+		[h1, h2, h5] + routers,
+		title='Host',
+		term='xterm'
+	)
+
 	info( '*** Running the command line interface\n' )
 	CLI( net )
-
-	info( '*** Closing the terminals on the hosts\n' )
-	h1.cmd("killall xterm")
-	h2.cmd("killall xterm")
-	h5.cmd("killall xterm")
-	r1.cmd("killall xterm")
-	r2.cmd("killall xterm")
-	r3.cmd("killall xterm")
-	r4.cmd("killall xterm")
-	r5.cmd("killall xterm")
 
 	info( '*** Stopping network' )
 	net.stop()
