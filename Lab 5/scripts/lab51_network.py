@@ -29,7 +29,7 @@ from mininet.node import Controller
 from mininet.log import setLogLevel, info
 
 # To launch xterm for each node
-from mininet.term import cleanUpScreens, makeTerms # for supporting copy/paste 
+from mininet.term import makeTerms 
 
 # Provides the mininet> prompt
 from mininet.cli import CLI
@@ -105,28 +105,18 @@ def run():
     h3.cmd('ip route add default via 10.20.1.10')
 
 
-    #Enable Xterm window for every host
-    info('** Enabling xterm for hosts only\n')
-    # We check if the display is available
+    info('*** Starting xterm on hosts\n')
     hosts = [ h1, h2, h3, r1 ]
-    if 'DISPLAY' not in os.environ:
-        error( "Error starting terms: Cannot connect to display\n" )
-        return
-    # Remove previous (and possible non-used) socat X11 tunnels
-    cleanUpScreens()
-    # Mininet's function to create Xterms in hosts
-    makeTerms( hosts, 'host' )
+    net.terms += makeTerms(
+        hosts,
+        title='Host',
+        term='xterm'
+    )
 
-	# Enable the mininet> prompt 
     info('** Running CLI\n')
     CLI(net)
-    r1.cmd("killall xterm")
-    h1.cmd("killall xterm")
-    h2.cmd("killall xterm")
-    h3.cmd("killall xterm")
     # This command stops the simulation
     net.stop()
-    cleanUpScreens()
 
 
 
